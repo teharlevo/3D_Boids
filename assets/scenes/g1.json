@@ -1,0 +1,53 @@
+{
+  "gameObjects": [
+    {
+      "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "rotation":   {"x": 0.0,"y": 0.0,"z": 45.0},
+      "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+      "components": [
+        {
+          "type": "Model",
+          "properties": {
+            "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
+            "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
+            "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+            "texture": "4",
+            "mesh": "CS2"
+          }
+        }
+      ]
+    }
+    ,
+    {
+      "position":   {"x": 0.0,"y": 0.0,"z": 1.0},
+      "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+      "components": [
+        {
+          "type": "PerspectiveCamera",
+          "properties": {
+            "name":   "default",
+            "position":        {"x": 0.0,"y": 0.0,"z": 0.0},
+            "rotation":        {"x": 0.0,"y": 45.0,"z": 0.0},
+            "FoV" : 90.0
+          }
+        },
+        {
+          "type": "MovingCamera",
+          "properties": {
+            "speed": 0.5,
+            "rotSpeed": 5.0
+          }
+        }
+      ]
+    }
+  ],
+  "renderers":[
+    {
+      "type": "MeshRenderer",
+      "name": "default",
+      "fragmentShader" :"normalMap",
+      "vertexShader":"default"
+    }
+  ]
+}
