@@ -18,7 +18,11 @@ import com.google.gson.JsonParser;
 
 import main.Assets.ComponentRegistry;
 import rendering.Model;
+import rendering.ShaderProgram;
+import rendering.Texture;
 import rendering.camera.Camera;
+import rendering.opengl_objects.FrameBuffer;
+import rendering.renderers.Effect;
 import rendering.renderers.MeshRenderer;
 
 public class Scene {
@@ -29,7 +33,12 @@ public class Scene {
 
     private Map<String, List<Model>> modelMap  = new HashMap<>();
 
+    private Map<String, FrameBuffer> frameBufferMap  = new HashMap<>();
+
     private Map<String, MeshRenderer> meshRendererMap  = new HashMap<>();
+    private Map<String, Effect> effectMap  = new HashMap<>();
+
+    private String renderPipelineJson;
 
     public Scene(String filePath) {
         try (Reader reader = new FileReader(filePath)) {
@@ -74,11 +83,43 @@ public class Scene {
                 JsonObject rendererObj = rendererElement.getAsJsonObject();
                 createRenderer(rendererObj);
             }
+
+            JsonArray frameBuffersJson = json.get("frameBuffers").getAsJsonArray();
+            for (JsonElement frameBufferElement : frameBuffersJson) {
+                JsonObject frameBufferObj = frameBufferElement.getAsJsonObject();
+                createFrameBuffer(frameBufferObj);
+            }
+
+            renderPipelineJson = json.get("pipelineActions").toString();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
+         
+    private void createRenderer(JsonObject rendererObj){
+        String type = rendererObj.get("type").getAsString();
+        String name = rendererObj.get("name").getAsString();
+
+        if(type.equals("mesh")){
+            String fragmentShader = rendererObj.get("fragmentShader").getAsString();
+            String vertexShader = rendererObj.get("vertexShader").getAsString();
+            
+            meshRendererMap.put(name, new MeshRenderer(vertexShader, fragmentShader));
+        }
+        else if(type.equals("effect")){
+            String fragmentShader = rendererObj.get("fragmentShader").getAsString();
+            effectMap.put(name, new Effect(fragmentShader));
+        }
+    }
+
+    private void createFrameBuffer(JsonObject rendererObj){
+        String name = rendererObj.get("name").getAsString();
+        int width = rendererObj.get("width").getAsInt();
+        int height = rendererObj.get("height").getAsInt();
+
+        frameBufferMap.put(name, new FrameBuffer(width, height));
     }
 
     private static Component createComponent(String type, JsonObject properties) {
@@ -119,18 +160,6 @@ public class Scene {
             return null;
         }
     }
-         
-    private void createRenderer(JsonObject rendererObj){
-        String type = rendererObj.get("type").getAsString();
-        String name = rendererObj.get("name").getAsString();
-
-        if(type.equals("MeshRenderer")){
-            String fragmentShader = rendererObj.get("fragmentShader").getAsString();
-            String vertexShader = rendererObj.get("vertexShader").getAsString();
-            
-            meshRendererMap.put(name, new MeshRenderer(vertexShader, fragmentShader));
-        }
-    }
 
     private static Vector3f getVector3fFromJson(JsonObject json) {
         float x = json.has("x") ? json.get("x").getAsFloat() : 0.0f;
@@ -167,7 +196,102 @@ public class Scene {
     }
 
     public void draw(){
-        meshRendererMap.get("default").draw("default", "default");
+
+        JsonArray renderPipeline = JsonParser.parseString(renderPipelineJson).getAsJsonArray();
+        for (JsonElement actionElement : renderPipeline) {
+            JsonObject actionObj = actionElement.getAsJsonObject();
+            drawAction(actionObj);
+        }
+    }
+
+    public void drawAction(JsonObject actionObj){
+        String type = actionObj.get("type").getAsString();
+        
+        switch (type){
+            case "draw":{
+                String rendererType = actionObj.get("rendererType").getAsString();
+                String rendererName = actionObj.get("rendererName").getAsString();
+                String renderGroup = actionObj.get("renderGroup").getAsString();
+                String cam = actionObj.get("cam").getAsString();
+
+                switch (rendererType) {
+                    case "mesh":
+                        meshRendererMap.get(rendererName).draw(cam, renderGroup);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+
+            case "setResolution":{
+                Window.setResolution(
+                    actionObj.get("width").getAsInt()
+                    ,actionObj.get("height").getAsInt());
+                break;
+            }
+            case "drawEffect":{
+                String name = actionObj.get("name").getAsString();
+                boolean clearColor = actionObj.get("clearColor").getAsBoolean();
+                boolean clearDepth = actionObj.get("clearDepth").getAsBoolean();
+                
+                effectMap.get(name).draw(clearColor, clearDepth);
+                break;
+            }
+
+            case "bind":{
+                String frameBufferName = actionObj.get("frameBufferName").getAsString();
+                frameBufferMap.get(frameBufferName).bind();
+                break;
+            }
+
+            case "unbind":{
+                String frameBufferName = actionObj.get("frameBufferName").getAsString();
+                frameBufferMap.get(frameBufferName).unbind();
+                break;
+            }
+            
+            case "upload":{
+                String uploadType = actionObj.get("uploadType").getAsString();
+                String value = actionObj.get("value").getAsString();
+
+                String loaderType = actionObj.get("loaderType").getAsString();
+                String loaderName = actionObj.get("loaderName").getAsString();
+                ShaderProgram sp;
+
+                switch (loaderType) {
+                    case "effect":
+                        sp = effectMap.get(loaderName).getSP();
+                        break;
+                    
+                    case "mesh":
+                        sp = meshRendererMap.get(loaderName).getSP();
+                        break;
+                
+                    default:
+                        break;
+                }
+
+
+                switch (uploadType) {
+                    case "texture":{
+                        getTextureFromScene(value).bind(0);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+        }
+
+    }
+
+    private Texture getTextureFromScene(String name){
+        if(name.indexOf(".texture") != -1){
+            return frameBufferMap.get(name.substring(0,name.indexOf("."))).getTexture();
+        }
+        return Assets.getTexture(name);
     }
 
     public Camera getCamera(String name){
@@ -197,5 +321,11 @@ public class Scene {
         modelMap.get(name).remove(model);
     }
 
-    
+    public String getRenderPipelineJson() {
+        return renderPipelineJson;
+    }
+
+    public void setRenderPipelineJson(String renderPipelineJson) {
+        this.renderPipelineJson = renderPipelineJson;
+    }
 }

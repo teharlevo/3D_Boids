@@ -150,10 +150,15 @@ public class Assets {
     }
 
     public static void init(){
+        Mesh m = new Mesh(vertexArrayBox);
+        meshMap.put("box",m);
+
+
         importFolderShadersSrc("assets\\shaders");
         importFolderTextures("assets\\textures");
         importFolderMeshs("assets\\meshs");
         importFolderScene("assets\\scenes");
+
     }
 
     public class ComponentRegistry {
@@ -167,4 +172,14 @@ public class Assets {
             return registry.get(type);
         }
     }
+
+    private static float[] vertexArrayBox = {
+        -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+         1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+        -1.0f, 1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+         1.0f,-1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+         1.0f, 1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+    };
 }
