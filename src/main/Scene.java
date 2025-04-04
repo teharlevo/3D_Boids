@@ -132,6 +132,8 @@ public class Scene {
             
             Component component = componentClass.getDeclaredConstructor().newInstance();
             
+            if(properties == null){return component;}
+            
             for (String key : properties.keySet()) {
                 try {
                     var field = componentClass.getField(key);
@@ -206,7 +208,6 @@ public class Scene {
 
     public void drawAction(JsonObject actionObj){
         String type = actionObj.get("type").getAsString();
-        
         switch (type){
             case "draw":{
                 String rendererType = actionObj.get("rendererType").getAsString();
@@ -253,11 +254,12 @@ public class Scene {
             
             case "upload":{
                 String uploadType = actionObj.get("uploadType").getAsString();
+                String uploadName = actionObj.get("uploadName").getAsString();
                 String value = actionObj.get("value").getAsString();
 
                 String loaderType = actionObj.get("loaderType").getAsString();
                 String loaderName = actionObj.get("loaderName").getAsString();
-                ShaderProgram sp;
+                ShaderProgram sp = meshRendererMap.get("default").getSP();
 
                 switch (loaderType) {
                     case "effect":
@@ -275,9 +277,20 @@ public class Scene {
 
                 switch (uploadType) {
                     case "texture":{
-                        getTextureFromScene(value).bind(0);
+                        sp.uploadTexture(uploadName, getTextureFromScene(value));
                         break;
                     }
+
+                    case "int":{
+                        sp.uploadInt(uploadName, Integer.parseInt(value));
+                        break;
+                    }
+
+                    case "float":{
+                        sp.uploadInt(uploadName, Integer.parseInt(value));
+                        break;
+                    }
+
                     default:
                         break;
                 }

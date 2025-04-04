@@ -39,6 +39,10 @@ public class Assets {
             textureMap.put(name, texture);
         }
     }
+    
+    public static void importTexture(Texture texture,String name){
+        textureMap.put(name, texture);
+    }
 
     public static void importMesh(String path){
         String name = new File(path).getName();
@@ -47,6 +51,10 @@ public class Assets {
             Mesh mesh = new Mesh(path);
             meshMap.put(name, mesh);
         }
+    }
+
+    public static void importMesh(Mesh mesh,String name){
+        meshMap.put(name, mesh);
     }
     
     public static void importShaderSrc(String path){
@@ -150,7 +158,7 @@ public class Assets {
     }
 
     public static void init(){
-        Mesh m = new Mesh(vertexArrayBox);
+        Mesh m = new Mesh(indicesArrayBox,vertexArrayBox);
         meshMap.put("box",m);
 
 
@@ -174,12 +182,14 @@ public class Assets {
     }
 
     private static float[] vertexArrayBox = {
-        -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-         1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+    };
 
-        -1.0f, 1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-         1.0f,-1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-         1.0f, 1.0f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+    private static int[] indicesArrayBox = { 
+        0, 1, 3,  
+        1, 2, 3,
     };
 }

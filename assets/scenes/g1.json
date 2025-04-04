@@ -6,13 +6,27 @@
       "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
       "components": [
         {
+          "type":"PlanetMaker",
+          "properties": {
+            "resolution":100
+          }
+        }
+      ]
+    },
+    {
+      "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+      "components": [
+        {
           "type": "Model",
           "properties": {
             "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
-            "rotation":   {"x": 0.0,"y": 0.0,"z": 30.0},
+            "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
             "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
-            "texture": "4",
-            "mesh": "CS2"
+            "texture": "CS2",
+            "mesh": "planet",
+            "renderGroup":"default"
           }
         }
       ]
@@ -27,15 +41,15 @@
           "type": "PerspectiveCamera",
           "properties": {
             "name":   "default",
-            "position":        {"x": 0.0,"y": 0.0,"z": 0.0},
-            "rotation":        {"x": 0.0,"y": 45.0,"z": 0.0},
-            "FoV" : 120.0
+            "position":        {"x": 0.0,"y": 0.0,"z": -2.0},
+            "rotation":        {"x": 0.0,"y": 0.0,"z": 0.0},
+            "FoV" : 90.0
           }
         },
         {
           "type": "MovingCamera",
           "properties": {
-            "speed": 0.5,
+            "speed": 0.05,
             "rotSpeed": 5.0
           }
         }
@@ -48,58 +62,17 @@
       "name": "default",
       "fragmentShader" :"default",
       "vertexShader":"default"
-    },
-    {
-      "type": "effect",
-      "name": "default",
-      "fragmentShader" :"default copy"
     }
   ],
   "frameBuffers":[
-    {
-      "name":"w",
-      "width": 250,
-      "height": 250
-    }
   ],
-  "pipelineActions":[    
-    {
-      "type":"setResolution",
-      "width": 250,
-      "height": 250
-    },
-    {
-      "type":"bind",
-      "frameBufferName":"w"
-    },
+  "pipelineActions":[ 
     {
       "type": "draw",
       "rendererType": "mesh",
       "rendererName": "default",
       "renderGroup": "default",
       "cam": "default"
-    },
-    {
-      "type":"unbind",
-      "frameBufferName":"w"
-    },
-    {
-      "type":"setResolution",
-      "width": 500,
-      "height": 500
-    },
-    {
-      "type":"upload",
-      "uploadType":"texture",
-      "value":"w.texture",
-      "loaderType":"effect",
-      "loaderName":"default"
-    },
-    {
-      "type":"drawEffect",
-      "name":"default",
-      "clearColor":true,
-      "clearDepth":true
     }
   ]
 }

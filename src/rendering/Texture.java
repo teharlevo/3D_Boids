@@ -61,7 +61,7 @@ public class Texture {
         width  = w.get(0);
         height = h.get(0);
         channels = c.get(0);
-        unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public Texture(int width, int height, int internalFormat, int format) {
@@ -79,7 +79,7 @@ public class Texture {
         this.width  = width;
         this.height = height;
         channels = 1;
-        unbind();
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public Texture(int width, int height) {
@@ -97,17 +97,8 @@ public class Texture {
         this.width = width;
         this.height = height;
 
-        unbind();
-        
-    }
-
-    public void bind(int place){
-        glActiveTexture(GL_TEXTURE0 + place);
-        glBindTexture(GL_TEXTURE_2D, texID);
-    }
-
-    public void unbind(){
         glBindTexture(GL_TEXTURE_2D, 0);
+        
     }
 
     public int getID(){

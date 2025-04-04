@@ -20,13 +20,26 @@ public class MovingCamera extends Component{
         
     }
     public void update() {
-        if(Input.getKeyPress("w")){
+
+        if(Input.getKeyPress("up")){
             getGameObject().getTransform().position.z += speed;
         }
-        if(Input.getKeyPress("s")){
+        if(Input.getKeyPress("down")){
             getGameObject().getTransform().position.z -= speed;
         }
+        if(Input.getKeyPress("left")){
+            getGameObject().getTransform().position.x += speed;
+        }
+        if(Input.getKeyPress("right")){
+            getGameObject().getTransform().position.x -= speed;
+        }
         
+        if(Input.getKeyPress("w")){
+            getGameObject().getTransform().rotation.x += rotSpeed;
+        }
+        if(Input.getKeyPress("s")){
+            getGameObject().getTransform().rotation.x -= rotSpeed;
+        }
         if(Input.getKeyPress("a")){
             getGameObject().getTransform().rotation.y += rotSpeed;
         }

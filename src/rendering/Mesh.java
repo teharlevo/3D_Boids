@@ -1,22 +1,31 @@
 package rendering;
 
+import java.nio.IntBuffer;
+
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import rendering.opengl_objects.Ebo;
 import rendering.opengl_objects.Vbo;
 import rendering.renderers.Renderer;
 
 public class Mesh {
     private float[] vertices;
+    private int[] indexArray;
 
     private Vbo vbo;
+    private Ebo ebo;
 
-    public Mesh(float[] MeshVertices) {
-        vbo = new Vbo(MeshVertices);
-        vertices = MeshVertices; 
+    public Mesh(int[] meshIndexArray,float[] meshVertices) {
+        vbo = new Vbo(meshVertices);
+        vertices = meshVertices; 
+
+        ebo = new Ebo(meshIndexArray);
+        indexArray = meshIndexArray;
     }
 
     public Mesh(String path) {
@@ -24,6 +33,7 @@ public class Mesh {
         AIScene scene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate);
         loadMeshs(scene);
         vbo = new Vbo(vertices);
+        ebo = new Ebo(indexArray);
     }
 
     private void loadMeshs(AIScene scene) {
@@ -31,26 +41,47 @@ public class Mesh {
         PointerBuffer bufferMeshes = scene.mMeshes();
         int numMeshes = Math.min(scene.mNumMeshes(), bufferMeshes.remaining());
         int totalVertices = 0;
+        int totalElements = 0;
         
 
         for (int i = 0; i < numMeshes; i++) {
             AIMesh mesh = AIMesh.create(bufferMeshes.get(i));
             totalVertices += mesh.mNumVertices();
+            totalElements += mesh.mNumFaces();
         }
     
         vertices = new float[totalVertices * Renderer.vertexSize];
+        indexArray = new int[totalElements * 3];
 
         int currentVertexIndex = 0;
+        int currentIndexIndex = 0;
 
         for (int i = 0; i < numMeshes; i++) {
             AIMesh mesh = AIMesh.create(bufferMeshes.get(i));
             
             float[] meshVertices = processMeshVertices(mesh);
 
+
+            int[] meshIndexArray = new int[mesh.mNumFaces() * 3] ;
+
+            int faceCount = mesh.mNumFaces();
+            AIFace.Buffer faces = mesh.mFaces();
+            for (int j = 0; j < faceCount; j++) {
+                AIFace face = faces.get(j);
+                
+                IntBuffer faceIndices = face.mIndices();
+
+                meshIndexArray[j * 3] = faceIndices.get() + currentIndexIndex;
+                meshIndexArray[j * 3 + 1] = faceIndices.get() + currentIndexIndex;
+                meshIndexArray[j * 3 + 2] = faceIndices.get() + currentIndexIndex;
+            }
+
             mesh.close();
 
             System.arraycopy(meshVertices, 0, vertices, currentVertexIndex * Renderer.vertexSize, meshVertices.length);
+            System.arraycopy(meshIndexArray, 0, indexArray, currentIndexIndex, meshIndexArray.length);
             currentVertexIndex += meshVertices.length/Renderer.vertexSize;
+            currentIndexIndex += meshIndexArray.length;
         }
     }
 
@@ -86,15 +117,24 @@ public class Mesh {
         return vertices;
     }
 
+    public int[] getIndexArray() {
+        return indexArray;
+    }
+
     public Vbo getVbo() {
         return vbo;
     }
 
+    public Ebo getEbo() {
+        return ebo;
+    }
+
     public void bind(){
         vbo.bind();
+        ebo.bind();
     }
 
     public int getSize() {
-        return vertices.length/Renderer.vertexSize;
+        return indexArray.length;
     }
 }

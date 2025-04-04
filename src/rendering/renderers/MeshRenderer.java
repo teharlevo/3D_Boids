@@ -6,7 +6,8 @@ import main.Assets;
 import main.Game;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 import rendering.camera.Camera;
 import rendering.Model;
@@ -41,7 +42,7 @@ public class MeshRenderer extends Renderer<Model>{
             m.bind(sp);
             vao.bind();
 
-            glDrawArrays(GL_TRIANGLES, 0,Assets.getMesh(m.mesh).getSize());
+            glDrawElements(GL_TRIANGLES, Assets.getMesh(m.mesh).getSize(), GL_UNSIGNED_INT, 0);
         }
         sp.detach();
     }

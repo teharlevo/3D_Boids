@@ -1,7 +1,13 @@
 package main;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 public class Game {
 
@@ -19,10 +25,17 @@ public class Game {
         currentScene.init();
     }
 
-    public static void init(String name,int width,int height, String sceneName) {
+    public static void init(String name,int width,int height,Boolean fullString, String sceneName) {
 
         Input.init();
-        Window.init(width, height, name);
+        
+        if(fullString){
+            Window.init(1920,1080, name);
+            Window.setFullScreen(true);
+        }
+        else{
+            Window.init(width, height, name);
+        }
         Assets.init();
         
 

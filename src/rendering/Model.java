@@ -18,17 +18,17 @@ public class Model extends Component{
 
     public String mesh;
 
+    public String renderGroup;
+
     private Matrix4f matrix;
 
     public void load(){
-        Game.getCurrentScene().addModel(this, "default");
+        Game.getCurrentScene().addModel(this, renderGroup);
     }
 
     ShaderProgram sp;
 
     public void init() {
-        
-        sp = new ShaderProgram(Assets.getVertexShaderSrc("default"),Assets.getFragmentShaderSrc("default"));
     }
 
     public void update() {
@@ -38,7 +38,7 @@ public class Model extends Component{
     public void bind(ShaderProgram sp){
         sp.uploadMat4f("uModel", matrix);
         Assets.getMesh(mesh).bind();
-        Assets.getTexture(texture).bind(0);
+        sp.uploadTexture("uTexture", Assets.getTexture(texture));
     }
 
     private void makeMatrix(){
