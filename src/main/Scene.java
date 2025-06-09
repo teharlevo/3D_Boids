@@ -19,11 +19,13 @@ import com.google.gson.JsonParser;
 import main.Assets.ComponentRegistry;
 import rendering.Model;
 import rendering.ShaderProgram;
+import rendering.Sprite;
 import rendering.Texture;
 import rendering.camera.Camera;
 import rendering.opengl_objects.FrameBuffer;
 import rendering.renderers.Effect;
 import rendering.renderers.MeshRenderer;
+import rendering.renderers.SpriteRenderer;
 
 public class Scene {
 
@@ -32,10 +34,12 @@ public class Scene {
     private Map<String, Camera> cameraMap = new HashMap<>();
 
     private Map<String, List<Model>> modelMap  = new HashMap<>();
+    private Map<String, List<Sprite>> spriteMap  = new HashMap<>();
 
     private Map<String, FrameBuffer> frameBufferMap  = new HashMap<>();
 
     private Map<String, MeshRenderer> meshRendererMap  = new HashMap<>();
+    private Map<String, SpriteRenderer> spriteRendererMap  = new HashMap<>();
     private Map<String, Effect> effectMap  = new HashMap<>();
 
     private String renderPipelineJson;
@@ -101,12 +105,19 @@ public class Scene {
     private void createRenderer(JsonObject rendererObj){
         String type = rendererObj.get("type").getAsString();
         String name = rendererObj.get("name").getAsString();
+        System.out.println(type);
 
         if(type.equals("mesh")){
             String fragmentShader = rendererObj.get("fragmentShader").getAsString();
             String vertexShader = rendererObj.get("vertexShader").getAsString();
             
             meshRendererMap.put(name, new MeshRenderer(vertexShader, fragmentShader));
+        }
+        else if(type.equals("sprite")){
+            String fragmentShader = rendererObj.get("fragmentShader").getAsString();
+            String vertexShader = rendererObj.get("vertexShader").getAsString();
+
+            spriteRendererMap.put(name, new SpriteRenderer(vertexShader, fragmentShader));
         }
         else if(type.equals("effect")){
             String fragmentShader = rendererObj.get("fragmentShader").getAsString();
@@ -219,6 +230,10 @@ public class Scene {
                     case "mesh":
                         meshRendererMap.get(rendererName).draw(cam, renderGroup);
                         break;
+                    case "spirte":
+                        System.out.println("W");
+                        spriteRendererMap.get(rendererName).draw(cam, renderGroup);
+                        break;
                     default:
                         break;
                 }
@@ -268,6 +283,9 @@ public class Scene {
                     
                     case "mesh":
                         sp = meshRendererMap.get(loaderName).getSP();
+                        break;
+                    case "sprite":
+                        sp = spriteRendererMap.get(loaderName).getSP();
                         break;
                 
                     default:
@@ -332,6 +350,21 @@ public class Scene {
 
     public void removeModel(Model model,String name){
         modelMap.get(name).remove(model);
+    }
+
+    public List<Sprite> getSprites(String name){
+        return spriteMap.get(name);
+    }
+
+    public void addSprite(Sprite sprite,String name){
+        if(!spriteMap.containsKey(name)){
+            spriteMap.put(name, new ArrayList<>());
+        }
+        spriteMap.get(name).add(sprite);
+    }
+
+    public void removeSprite(Sprite sprite,String name){
+        spriteMap.get(name).remove(sprite);
     }
 
     public String getRenderPipelineJson() {

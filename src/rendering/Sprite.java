@@ -8,7 +8,7 @@ import main.Game;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class Model extends Component{
+public class Sprite extends Component{
 
     public Vector3f position;
     public Vector3f rotation;
@@ -16,14 +16,12 @@ public class Model extends Component{
 
     public String texture;
 
-    public String mesh;
-
     public String renderGroup;
 
     private Matrix4f matrix;
 
     public void load(){
-        Game.getCurrentScene().addModel(this, renderGroup);
+        Game.getCurrentScene().addSprite(this, renderGroup);
     }
 
     public void init() {
@@ -35,11 +33,14 @@ public class Model extends Component{
 
     public void bind(ShaderProgram sp){
         sp.uploadMat4f("uModel", matrix);
-        Assets.getMesh(mesh).bind();
+        Assets.getMesh("box").bind();
         sp.uploadTexture("uTexture", Assets.getTexture(texture));
     }
 
     private void makeMatrix(){
+        Texture tex = Assets.getTexture(texture);
+        float nor = (float)Math.sqrt(tex.width()*tex.width() + tex.height()*tex.height());
+
         Matrix4f matrix = new Matrix4f();
 		matrix.identity();
 
@@ -51,6 +52,11 @@ public class Model extends Component{
 
         Vector3f objectScale = new Vector3f();
         getGameObject().getTransform().scale.mul(scale,objectScale);
+        
+        objectScale = new Vector3f();
+        getGameObject().getTransform().scale.mul(new Vector3f(
+            tex.width()/(nor)
+            ,tex.height()/(nor),1),objectScale);
         
         matrix =   matrix.translate(transform, matrix);
         matrix = matrix.rotate((float) Math.toRadians(rot.x)
@@ -67,6 +73,6 @@ public class Model extends Component{
     }
 
     static {
-        ComponentRegistry.registerComponent("Model", Model.class);
+        ComponentRegistry.registerComponent("Sprite", Sprite.class);
     }
 }

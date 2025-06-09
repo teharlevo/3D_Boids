@@ -19,6 +19,24 @@
       "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
       "components": [
         {
+          "type": "Sprite",
+          "properties": {
+            "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
+            "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
+            "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+            "texture": "4",
+            "renderGroup":"default"
+          }
+        }
+      ]
+    },
+    
+    {
+      "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "rotation":   {"x": 0.0,"y": 0.0,"z": 0.0},
+      "scale":      {"x": 1.0,"y": 1.0,"z": 1.0},
+      "components": [
+        {
           "type": "Model",
           "properties": {
             "position":   {"x": 0.0,"y": 0.0,"z": 0.0},
@@ -62,11 +80,37 @@
       "name": "default",
       "fragmentShader" :"default",
       "vertexShader":"default"
+    },
+        {
+      "type": "sprite",
+      "name": "default",
+      "fragmentShader" :"default",
+      "vertexShader":"default"
+    },
+    {
+      "type": "mesh",
+      "name": "default copy",
+      "fragmentShader" :"default copy",
+      "vertexShader":"default copy"
     }
   ],
   "frameBuffers":[
   ],
   "pipelineActions":[ 
+    {
+      "type": "draw",
+      "rendererType": "mesh",
+      "rendererName": "default",
+      "renderGroup": "default",
+      "cam": "default"
+    },
+    {
+      "type": "draw",
+      "rendererType": "spirte",
+      "rendererName": "default",
+      "renderGroup": "default",
+      "cam": "default"
+    },
     {
       "type": "draw",
       "rendererType": "mesh",

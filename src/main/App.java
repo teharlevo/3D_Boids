@@ -1,6 +1,7 @@
 package main;
 
 import rendering.Model;
+import rendering.Sprite;
 import rendering.camera.Camera;
 import specific.MovingCamera;
 import specific.PlanetMaker;
@@ -17,6 +18,7 @@ public class App {
         
         new Model();
         new MovingCamera();
+        new Sprite();
         new PlanetMaker();
         new Camera() {
             
